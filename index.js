@@ -42,4 +42,6 @@ app.post('/chat', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Groq API Proxy server listening at http://localhost:${port}`);
-}); 
+});
+
+// module.exports = app; 
