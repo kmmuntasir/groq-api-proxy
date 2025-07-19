@@ -1,0 +1,31 @@
+{
+  "name": "groq-api-proxy",
+  "version": "1.0.0",
+  "description": "**Secure, configurable proxy backend for Groq AI API.**  \r Safely connect your frontend apps (React, Vue, mobile, etc.) to Groq’s `/chat/completions` endpoint without exposing your API key.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmmuntasir/groq-api-proxy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kmmuntasir/groq-api-proxy/issues"
+  },
+  "homepage": "https://github.com/kmmuntasir/groq-api-proxy#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "groq-sdk": "^0.27.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
