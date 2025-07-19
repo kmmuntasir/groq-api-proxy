@@ -118,7 +118,7 @@ This proxy exposes a single POST endpoint `/chat` that mirrors the Groq Chat Com
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "The capital of France is Paris."
+                "content": "Here's a short and fun fact about the universe:\n\nDid you know that there is a giant storm on Jupiter that has been raging for at least 187 years? It's called the Great Red Spot, and it's so big that three Earths could fit inside it!"
             },
             "logprobs": null,
             "finish_reason": "stop"
