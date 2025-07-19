@@ -20,6 +20,7 @@ Safely connect your frontend apps (React, Vue, mobile, etc.) to Groq’s `/chat/
 
 ## 📦 Project Structure
 
+```
 groq-api-proxy/
 ├── index.js          # Main Express app
 ├── .env.example      # Example environment file
@@ -27,7 +28,7 @@ groq-api-proxy/
 ├── package.json
 ├── package-lock.json
 └── README.md
-
+```
 
 ---
 

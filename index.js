@@ -20,6 +20,9 @@ app.use((err, req, res, next) => {
 const cors = require('cors');
 app.use(cors());
 
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
