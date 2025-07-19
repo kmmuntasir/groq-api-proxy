@@ -8,6 +8,14 @@ const port = process.env.PORT || 3001;
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
+// Custom error handling for JSON parsing errors
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ error: 'Failed to parse JSON body.' });
+    }
+    next();
+});
+
 // Enable CORS for all origins (you might want to restrict this in production)
 const cors = require('cors');
 app.use(cors());
@@ -20,7 +28,7 @@ app.post('/chat', async (req, res) => {
     try {
         const { model, messages, temperature, top_p, ...rest } = req.body;
 
-        if (!messages) {
+        if (!messages || messages.length === 0) {
             return res.status(400).json({ error: 'Messages are required.' });
         }
 
@@ -40,8 +48,12 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Groq API Proxy server listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Groq API Proxy server listening at http://localhost:${port}`);
+// });
 
-// module.exports = app; 
+if (process.env.NODE_ENV === 'test') {
+    module.exports = { app, groq };
+} else {
+    module.exports = app;
+} 
