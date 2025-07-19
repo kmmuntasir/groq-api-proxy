@@ -48,12 +48,11 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// app.listen(port, () => {
-//     console.log(`Groq API Proxy server listening at http://localhost:${port}`);
-// });
-
 if (process.env.NODE_ENV === 'test') {
-    module.exports = { app, groq };
+    module.exports = { app, groq }; // Export app and groq for testing
 } else {
-    module.exports = app;
+    app.listen(port, () => {
+        console.log(`Groq API Proxy server listening at http://localhost:${port}`);
+    });
+    module.exports = app; // Export app for normal execution
 } 
