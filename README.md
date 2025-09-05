@@ -94,7 +94,7 @@ This proxy exposes a single POST endpoint `/chat` that mirrors the Groq Chat Com
 
 ```json
 {
-    "model": "llama3-8b-8192",
+    "model": "llama-3.1-8b-instant",
     "messages": [
         {
             "role": "user",
@@ -113,7 +113,7 @@ This proxy exposes a single POST endpoint `/chat` that mirrors the Groq Chat Com
     "id": "chatcmpl-xxxxxxxxxxxxxxxxxxxxxx",
     "object": "chat.completion",
     "created": 1718035200,
-    "model": "llama3-8b-8192",
+    "model": "llama-3.1-8b-instant",
     "choices": [
         {
             "index": 0,
