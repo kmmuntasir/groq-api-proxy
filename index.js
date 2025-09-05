@@ -61,6 +61,43 @@ app.use(cors());
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
+// Request logging middleware
+app.use((req, res, next) => {
+    const startTime = Date.now();
+
+    // Log incoming request
+    logger.info('Incoming request', {
+        method: req.method,
+        url: req.url,
+        headers: {
+            'content-type': req.headers['content-type'],
+            'user-agent': req.headers['user-agent'],
+            'x-forwarded-for': req.headers['x-forwarded-for'] || req.ip
+        },
+        body: req.method === 'POST' ? req.body : undefined
+    });
+
+    // Override res.json to log response
+    const originalJson = res.json;
+    res.json = function(data) {
+        const duration = Date.now() - startTime;
+
+        // Log outgoing response
+        logger.info('Outgoing response', {
+            method: req.method,
+            url: req.url,
+            statusCode: res.statusCode,
+            duration: `${duration}ms`,
+            responseSize: JSON.stringify(data).length,
+            response: data
+        });
+
+        return originalJson.call(this, data);
+    };
+
+    next();
+});
+
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
@@ -82,6 +119,13 @@ app.post('/chat', async (req, res) => {
             temperature: temperature || 0.7, // Default temperature
             top_p: top_p || 1,             // Default top_p
             ...rest
+        });
+
+        // Log successful Groq API call
+        logger.info('Groq API call successful', {
+            model: completion.model,
+            usage: completion.usage,
+            choices: completion.choices?.length || 0
         });
 
         res.json(completion);

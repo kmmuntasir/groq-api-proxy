@@ -21,3 +21,10 @@
 - Log files are created in YYYY-MM-DD.log format in the logs/ directory
 - Logs are stored in JSON format for better parsing and analysis
 - File rotation configured with 20MB max size and 14-day retention
+
+## 2025-09-05 20:13:00
+- Added comprehensive request/response logging middleware
+- Incoming requests now logged with method, URL, headers, and body
+- Outgoing responses logged with status code, duration, and response data
+- Successful Groq API calls now logged with model, usage statistics, and choice count
+- All requests and responses (success and error cases) are now fully logged
