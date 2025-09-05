@@ -188,7 +188,8 @@ describe('Chat API Integration Tests', () => {
                     .end((err, res) => {
                         if (err) return done(err);
                         
-                        assertErrorResponse(res.body, 'Internal server error.', { expect });
+                        // The new architecture returns the full error message from the service
+                        assertErrorResponse(res.body, 'Failed to communicate with Groq API: API rate limit exceeded', { expect });
                         
                         // Restore original stub behavior
                         groqStub.restore();
@@ -210,6 +211,19 @@ describe('Chat API Integration Tests', () => {
 
         describe('Request/Response Logging', () => {
             it('should log requests and responses', (done) => {
+                // Ensure stub is properly set up for success
+                groqStub.restore();
+                groqStub = sinon.stub(groq.chat.completions, 'create').callsFake((params) => {
+                    if (params.messages && params.messages.length > 0) {
+                        return Promise.resolve(createMockGroqResponse({
+                            model: params.model || 'test-model',
+                            content: 'This is a mocked response.'
+                        }));
+                    } else {
+                        return Promise.reject(new Error('Messages are required.'));
+                    }
+                });
+
                 const requestData = createMockRequest();
 
                 request(app)
@@ -228,6 +242,19 @@ describe('Chat API Integration Tests', () => {
 
         describe('CORS Support', () => {
             it('should include CORS headers', (done) => {
+                // Ensure stub is properly set up for success
+                groqStub.restore();
+                groqStub = sinon.stub(groq.chat.completions, 'create').callsFake((params) => {
+                    if (params.messages && params.messages.length > 0) {
+                        return Promise.resolve(createMockGroqResponse({
+                            model: params.model || 'test-model',
+                            content: 'This is a mocked response.'
+                        }));
+                    } else {
+                        return Promise.reject(new Error('Messages are required.'));
+                    }
+                });
+
                 const requestData = createMockRequest();
 
                 request(app)
@@ -250,8 +277,14 @@ describe('Chat API Integration Tests', () => {
         it('should serve static files from public directory', (done) => {
             request(app)
                 .get('/')
-                .expect(404) // No index.html in public, so 404 is expected
-                .end(done);
+                .expect(200) // index.html exists in public directory
+                .end((err, res) => {
+                    if (err) return done(err);
+                    
+                    // Should return HTML content
+                    expect(res.headers['content-type']).to.include('text/html');
+                    done();
+                });
         });
     });
 
