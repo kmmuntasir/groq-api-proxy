@@ -68,9 +68,10 @@ NODE_ENV=test mocha test/chat.test.js
 - Defaults: PORT=3001, DEFAULT_MODEL="llama-3.1-8b-instant", LOG_LEVEL="info"
 
 **Logging System**
-- Winston with dual transport: Console (boxed format) + Daily rotating files (JSON)
+- Winston with dual transport: Console (boxed format) + Daily rotating files (boxed format)
 - Log files stored in `/logs/` directory with date pattern YYYY-MM-DD
 - Beautiful boxed console logging with rounded corners and dividers for HTTP requests/responses
+- Both console and log files use identical formatting for consistency
 - Comprehensive logging includes method, URL, status, duration, payload sizes, headers, and full request/response bodies
 - Log levels: error, warn, info, debug
 
@@ -144,7 +145,7 @@ LOG_LEVEL=info                     # Winston log level
 │   "content-type": "application/json",
 │   "user-agent": "curl/8.5.0",
 │   "x-forwarded-for": "::1"
-│ } │
+│ }
 ├────────────────────────────────────────────────────────────────────────────────┤
 │ BODY: │
 │ {
@@ -154,7 +155,7 @@ LOG_LEVEL=info                     # Winston log level
 │       "content": "Test message"
 │     }
 │   ]
-│ } │
+│ }
 └────────────────────────────────────────────────────────────────────────────────┘
 
 2025-09-05 20:45:08.226 [info] Groq API call successful
@@ -167,7 +168,7 @@ LOG_LEVEL=info                     # Winston log level
 │   "prompt_tokens": 10,
 │   "completion_tokens": 5,
 │   "total_tokens": 15
-│ } │
+│ }
 └────────────────────────────────────────────────────────────────────────────────┘
 
 2025-09-05 20:23:21.247 [info] Outgoing response
@@ -180,16 +181,16 @@ LOG_LEVEL=info                     # Winston log level
 │   "id": "chatcmpl-...",
 │   "object": "chat.completion",
 │   "choices": [...]
-│ } │
+│ }
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Log Files**: JSON format for programmatic processing and long-term storage
+**Log Files**: Same beautiful boxed format as console for consistent readability
 
 ### Debugging
 - Check console logs for beautifully formatted boxed request/response data
-- Review daily log files in `/logs/` directory for JSON-formatted historical data
-- Console logs show clear boxed format with method, URL, status, duration, and full payloads
+- Review daily log files in `/logs/` directory for identical boxed-formatted historical data
+- Both console and log files show clear boxed format with method, URL, status, duration, and full payloads
 - Error logs include stack traces and detailed error context
 
 ## Deployment Notes
