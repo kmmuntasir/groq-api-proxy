@@ -68,9 +68,10 @@ NODE_ENV=test mocha test/chat.test.js
 - Defaults: PORT=3001, DEFAULT_MODEL="llama-3.1-8b-instant", LOG_LEVEL="info"
 
 **Logging System**
-- Winston with dual transport: Console (colorized) + Daily rotating files
+- Winston with dual transport: Console (boxed format) + Daily rotating files (JSON)
 - Log files stored in `/logs/` directory with date pattern YYYY-MM-DD
-- Comprehensive request/response logging including timing and payload sizes
+- Beautiful boxed console logging with rounded corners and dividers for HTTP requests/responses
+- Comprehensive logging includes method, URL, status, duration, payload sizes, headers, and full request/response bodies
 - Log levels: error, warn, info, debug
 
 ### API Design
@@ -129,10 +130,53 @@ LOG_LEVEL=info                     # Winston log level
 - `example.env`: Environment variable template
 - `docker-compose.yml`: Simple single-service Docker setup
 
+### Logging Format
+
+**Console Output**: Beautiful boxed format with rounded corners for HTTP requests and responses
+```
+2025-09-05 20:23:19.662 [info] Incoming request
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ METHOD: POST │
+│ URL: /chat │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ HEADERS: │
+│ {
+│   "content-type": "application/json",
+│   "user-agent": "curl/8.5.0",
+│   "x-forwarded-for": "::1"
+│ } │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ BODY: │
+│ {
+│   "messages": [
+│     {
+│       "role": "user",
+│       "content": "Test message"
+│     }
+│   ]
+│ } │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+2025-09-05 20:23:21.247 [info] Outgoing response
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ REQUEST: POST /chat │
+│ STATUS: 200 | DURATION: 1586ms | SIZE: 2599 bytes │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ RESPONSE: │
+│ {
+│   "id": "chatcmpl-...",
+│   "object": "chat.completion",
+│   "choices": [...]
+│ } │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Log Files**: JSON format for programmatic processing and long-term storage
+
 ### Debugging
-- Check console logs for formatted request/response data
-- Review daily log files in `/logs/` directory for historical data
-- Winston logs include timing, payload sizes, and full request context
+- Check console logs for beautifully formatted boxed request/response data
+- Review daily log files in `/logs/` directory for JSON-formatted historical data
+- Console logs show clear boxed format with method, URL, status, duration, and full payloads
 - Error logs include stack traces and detailed error context
 
 ## Deployment Notes

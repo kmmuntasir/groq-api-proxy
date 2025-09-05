@@ -4,6 +4,80 @@ const Groq = require('groq-sdk');
 const winston = require('winston');
 require('winston-daily-rotate-file');
 
+// Helper function to format boxed logs
+const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
+    const ts = new Date(timestamp);
+    const formattedTimestamp = ts.toISOString().replace('T', ' ').slice(0, -5) + '.' + String(ts.getMilliseconds()).padStart(3, '0');
+    
+    // Handle HTTP request logging
+    if (message === 'Incoming request') {
+        const { method, url, headers, body } = meta;
+        const boxWidth = 80;
+        const topBorder = '┌' + '─'.repeat(boxWidth - 2) + '┐';
+        const bottomBorder = '└' + '─'.repeat(boxWidth - 2) + '┘';
+        const divider = '├' + '─'.repeat(boxWidth - 2) + '┤';
+        
+        let result = `${formattedTimestamp} [${level}] ${message}\n`;
+        result += `${topBorder}\n`;
+        result += `│ METHOD: ${method} │\n`;
+        result += `│ URL: ${url} │\n`;
+        result += `${divider}\n`;
+        result += `│ HEADERS: │\n`;
+        
+        if (headers) {
+            const headersStr = JSON.stringify(headers, null, 2);
+            const headerLines = headersStr.split('\n');
+            for (const line of headerLines) {
+                result += `│ ${line} │\n`;
+            }
+        }
+        
+        if (body) {
+            result += `${divider}\n`;
+            result += `│ BODY: │\n`;
+            const bodyStr = JSON.stringify(body, null, 2);
+            const bodyLines = bodyStr.split('\n');
+            for (const line of bodyLines) {
+                result += `│ ${line} │\n`;
+            }
+        }
+        
+        result += `${bottomBorder}`;
+        return result;
+    }
+    
+    // Handle HTTP response logging
+    if (message === 'Outgoing response') {
+        const { method, url, statusCode, duration, responseSize, response } = meta;
+        const boxWidth = 80;
+        const topBorder = '┌' + '─'.repeat(boxWidth - 2) + '┐';
+        const bottomBorder = '└' + '─'.repeat(boxWidth - 2) + '┘';
+        const divider = '├' + '─'.repeat(boxWidth - 2) + '┤';
+        
+        let result = `${formattedTimestamp} [${level}] ${message}\n`;
+        result += `${topBorder}\n`;
+        result += `│ REQUEST: ${method} ${url} │\n`;
+        result += `│ STATUS: ${statusCode} | DURATION: ${duration} | SIZE: ${responseSize} bytes │\n`;
+        result += `${divider}\n`;
+        result += `│ RESPONSE: │\n`;
+        
+        if (response) {
+            const responseStr = JSON.stringify(response, null, 2);
+            const responseLines = responseStr.split('\n');
+            for (const line of responseLines) {
+                result += `│ ${line} │\n`;
+            }
+        }
+        
+        result += `${bottomBorder}`;
+        return result;
+    }
+    
+    // Standard log format for other messages
+    const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+    return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
+};
+
 // Configure winston logger
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
@@ -17,12 +91,7 @@ const logger = winston.createLogger({
         new winston.transports.Console({
             format: winston.format.combine(
                 winston.format.colorize(),
-                winston.format.printf(({ timestamp, level, message, ...meta }) => {
-                    const ts = new Date(timestamp);
-                    const formattedTimestamp = ts.toISOString().replace('T', ' ').slice(0, -5) + '.' + String(ts.getMilliseconds()).padStart(3, '0');
-                    const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-                    return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
-                })
+                winston.format.printf(formatBoxedLog)
             )
         }),
         new winston.transports.DailyRotateFile({
