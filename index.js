@@ -1,6 +1,31 @@
 require('dotenv').config();
 const express = require('express');
 const Groq = require('groq-sdk');
+const winston = require('winston');
+
+// Configure winston logger
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+    ),
+    defaultMeta: { service: 'groq-api-proxy' },
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.printf(({ timestamp, level, message, ...meta }) => {
+                    const ts = new Date(timestamp);
+                    const formattedTimestamp = ts.toISOString().replace('T', ' ').slice(0, -5) + '.' + String(ts.getMilliseconds()).padStart(3, '0');
+                    const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+                    return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
+                })
+            )
+        })
+    ]
+});
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -27,8 +52,8 @@ const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
 
-console.log("GROQ_API_KEY from environment:", process.env.GROQ_API_KEY ? "Set" : "Not Set");
-console.log("GROQ_API_KEY value (first 5 chars):", process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 5) + "..." : "");
+logger.info("GROQ_API_KEY from environment:", { status: process.env.GROQ_API_KEY ? "Set" : "Not Set" });
+logger.info("GROQ_API_KEY value (first 5 chars):", { value: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 5) + "..." : "" });
 
 app.post('/chat', async (req, res) => {
     try {
@@ -49,7 +74,7 @@ app.post('/chat', async (req, res) => {
         res.json(completion);
 
     } catch (error) {
-        console.error('Error proxying request to Groq API:', error);
+        logger.error('Error proxying request to Groq API:', { error: error.message, stack: error.stack });
         res.status(500).json({ error: 'Failed to communicate with Groq API', details: error.message });
     }
 });
@@ -58,7 +83,7 @@ if (process.env.NODE_ENV === 'test') {
     module.exports = { app, groq }; // Export app and groq for testing
 } else {
     app.listen(port, () => {
-        console.log(`Groq API Proxy server listening at http://localhost:${port}`);
+        logger.info(`Groq API Proxy server listening at http://localhost:${port}`, { port });
     });
     module.exports = app; // Export app for normal execution
 } 

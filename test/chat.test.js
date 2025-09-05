@@ -2,6 +2,31 @@ const request = require('supertest');
 const { expect } = require('chai');
 const { app, groq } = require('../index'); // Adjust path and destructure app and groq
 const sinon = require('sinon');
+const winston = require('winston');
+
+// Configure test logger
+const testLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+    ),
+    defaultMeta: { service: 'groq-api-proxy-test' },
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.printf(({ timestamp, level, message, ...meta }) => {
+                    const ts = new Date(timestamp);
+                    const formattedTimestamp = ts.toISOString().replace('T', ' ').slice(0, -5) + '.' + String(ts.getMilliseconds()).padStart(3, '0');
+                    const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+                    return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
+                })
+            )
+        })
+    ]
+});
 
 describe('Chat API', () => {
     let server;
@@ -37,7 +62,7 @@ describe('Chat API', () => {
         });
 
         server = app.listen(3001, () => {
-            console.log('Test server listening on port 3001');
+            testLogger.info('Test server listening on port 3001');
             done();
         });
     });
@@ -45,7 +70,7 @@ describe('Chat API', () => {
     after((done) => {
         groqStub.restore(); // Restore the original method
         server.close(() => {
-            console.log('Test server closed');
+            testLogger.info('Test server closed');
             done();
         });
     });
