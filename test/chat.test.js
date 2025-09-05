@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const { app, groq } = require('../index'); // Adjust path and destructure app and groq
 const sinon = require('sinon');
 const winston = require('winston');
+require('winston-daily-rotate-file');
 
 // Configure test logger
 const testLogger = winston.createLogger({
@@ -23,6 +24,18 @@ const testLogger = winston.createLogger({
                     const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
                     return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
                 })
+            )
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: 'logs/%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: false,
+            maxSize: '20m',
+            maxFiles: '14d',
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.errors({ stack: true }),
+                winston.format.json()
             )
         })
     ]

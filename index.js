@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const Groq = require('groq-sdk');
 const winston = require('winston');
+require('winston-daily-rotate-file');
 
 // Configure winston logger
 const logger = winston.createLogger({
@@ -22,6 +23,18 @@ const logger = winston.createLogger({
                     const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
                     return `${formattedTimestamp} [${level}] ${message}${metaStr}`;
                 })
+            )
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: 'logs/%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: false,
+            maxSize: '20m',
+            maxFiles: '14d',
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.errors({ stack: true }),
+                winston.format.json()
             )
         })
     ]
