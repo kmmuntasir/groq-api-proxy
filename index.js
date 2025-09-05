@@ -39,7 +39,7 @@ app.post('/chat', async (req, res) => {
         }
 
         const completion = await groq.chat.completions.create({
-            model: model || "llama-3.1-8b-instant", // Default model if not provided
+            model: model || process.env.DEFAULT_MODEL || "llama-3.1-8b-instant", // Default model if not provided
             messages: messages,
             temperature: temperature || 0.7, // Default temperature
             top_p: top_p || 1,             // Default top_p
