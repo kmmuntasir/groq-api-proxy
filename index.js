@@ -46,6 +46,33 @@ const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
         return result;
     }
     
+    // Handle Groq API call success logging
+    if (message === 'Groq API call successful') {
+        const { model, usage, choices } = meta;
+        const boxWidth = 80;
+        const topBorder = '┌' + '─'.repeat(boxWidth - 2) + '┐';
+        const bottomBorder = '└' + '─'.repeat(boxWidth - 2) + '┘';
+        const divider = '├' + '─'.repeat(boxWidth - 2) + '┤';
+        
+        let result = `${formattedTimestamp} [${level}] ${message}\n`;
+        result += `${topBorder}\n`;
+        result += `│ MODEL: ${model} │\n`;
+        result += `│ CHOICES: ${choices} | TOKENS: ${usage?.total_tokens || 'N/A'} | TIME: ${usage?.total_time ? (usage.total_time * 1000).toFixed(0) + 'ms' : 'N/A'} │\n`;
+        result += `${divider}\n`;
+        result += `│ USAGE DETAILS: │\n`;
+        
+        if (usage) {
+            const usageStr = JSON.stringify(usage, null, 2);
+            const usageLines = usageStr.split('\n');
+            for (const line of usageLines) {
+                result += `│ ${line} │\n`;
+            }
+        }
+        
+        result += `${bottomBorder}`;
+        return result;
+    }
+    
     // Handle HTTP response logging
     if (message === 'Outgoing response') {
         const { method, url, statusCode, duration, responseSize, response } = meta;
