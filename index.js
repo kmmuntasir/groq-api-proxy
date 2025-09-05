@@ -28,7 +28,7 @@ const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
             const headersStr = JSON.stringify(headers, null, 2);
             const headerLines = headersStr.split('\n');
             for (const line of headerLines) {
-                result += `│ ${line} │\n`;
+                result += `│ ${line}\n`;
             }
         }
         
@@ -38,7 +38,7 @@ const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
             const bodyStr = JSON.stringify(body, null, 2);
             const bodyLines = bodyStr.split('\n');
             for (const line of bodyLines) {
-                result += `│ ${line} │\n`;
+                result += `│ ${line}\n`;
             }
         }
         
@@ -65,7 +65,7 @@ const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
             const usageStr = JSON.stringify(usage, null, 2);
             const usageLines = usageStr.split('\n');
             for (const line of usageLines) {
-                result += `│ ${line} │\n`;
+                result += `│ ${line}\n`;
             }
         }
         
@@ -92,7 +92,7 @@ const formatBoxedLog = ({ timestamp, level, message, ...meta }) => {
             const responseStr = JSON.stringify(response, null, 2);
             const responseLines = responseStr.split('\n');
             for (const line of responseLines) {
-                result += `│ ${line} │\n`;
+                result += `│ ${line}\n`;
             }
         }
         
