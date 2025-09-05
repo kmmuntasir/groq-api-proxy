@@ -43,6 +43,12 @@ class GroqService {
                 ...rest
             });
 
+            // Handle null/empty responses
+            if (!completion) {
+                logger.warn('Groq API returned null/empty response');
+                return completion;
+            }
+
             // Log successful API call
             logger.info('Groq API call successful', {
                 model: completion.model,

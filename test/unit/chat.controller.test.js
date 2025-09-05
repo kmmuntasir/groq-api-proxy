@@ -64,17 +64,21 @@ describe('Chat Controller', () => {
         });
 
         it('should handle groq service errors with status code', async () => {
+            const originalError = new Error('Original service error');
             const mockError = createMockGroqError('Service unavailable', 503);
             mockError.statusCode = 503;
+            mockError.originalError = originalError; // Add originalError for details
             groqServiceStub.rejects(mockError);
 
             await chatController.createChatCompletion(req, res);
 
             expect(groqServiceStub.calledOnce).to.be.true;
             expect(res.status.calledWith(503)).to.be.true;
-            expect(res.json.calledWith({
-                error: mockError.message
-            })).to.be.true;
+            expect(res.json.calledOnce).to.be.true;
+            const callArgs = res.json.getCall(0).args[0];
+            expect(callArgs.error).to.equal(mockError.message);
+            expect(callArgs.details).to.equal(originalError.message); // Development mode includes details
+            expect(callArgs.timestamp).to.exist; // Development mode includes timestamp
         });
 
         it('should handle groq service errors without status code', async () => {
@@ -84,9 +88,10 @@ describe('Chat Controller', () => {
             await chatController.createChatCompletion(req, res);
 
             expect(res.status.calledWith(500)).to.be.true;
-            expect(res.json.calledWith({
-                error: mockError.message
-            })).to.be.true;
+            expect(res.json.calledOnce).to.be.true;
+            const callArgs = res.json.getCall(0).args[0];
+            expect(callArgs.error).to.equal(mockError.message);
+            expect(callArgs.timestamp).to.exist; // Development mode includes timestamp
         });
 
         it('should handle empty response from groq service', async () => {
