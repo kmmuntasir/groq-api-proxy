@@ -22,12 +22,42 @@ Safely connect your frontend apps (React, Vue, mobile, etc.) to Groq’s `/chat/
 
 ```
 groq-api-proxy/
-├── index.js          # Main Express app
-├── example.env       # Example environment file
-├── .env              # Environment variables (private, not committed)
+├── src/                     # Application source code
+│   ├── app.js              # Express application setup
+│   ├── server.js           # Server management & lifecycle
+│   ├── config/             # Configuration modules
+│   │   ├── index.js        # Environment configuration
+│   │   └── cors.js         # CORS settings
+│   ├── controllers/        # Request handlers
+│   │   └── chatController.js
+│   ├── middleware/         # Express middleware
+│   │   ├── errorHandler.js # Error handling
+│   │   ├── requestLogger.js # Request/response logging
+│   │   └── validation.js   # Request validation
+│   ├── routes/             # API routes
+│   │   ├── index.js        # Main routes handler
+│   │   └── chatRoutes.js   # Chat endpoint routes
+│   ├── services/           # Business logic
+│   │   └── groqService.js  # Groq API integration
+│   └── utils/              # Utilities
+│       ├── constants.js    # App constants
+│       └── logger.js       # Winston logger setup
+├── test/                   # Test suite
+│   ├── unit/               # Unit tests
+│   ├── integration/        # Integration tests
+│   ├── utils/              # Test utilities
+│   └── README.md           # Testing guide
+├── public/                 # Static files
+├── logs/                   # Application logs
+├── docs/                   # Documentation
+├── index.js                # Application entry point
+├── example.env             # Example environment file
+├── .env                    # Environment variables (private)
 ├── package.json
 ├── package-lock.json
-└── README.md
+├── README.md
+├── WARP.md                 # Development guide
+└── ai-changelog.md         # Development history
 ```
 
 ---
@@ -78,6 +108,39 @@ npm start
 ```
 
 The server will be running at `http://localhost:3001` (or your specified PORT).
+
+---
+
+## ⚙️ Testing
+
+The project includes a comprehensive test suite with both unit and integration tests.
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run only unit tests
+npm run test:unit
+
+# Run only integration tests
+npm run test:integration
+
+# Run tests in watch mode (for development)
+npm run test:watch
+
+# Generate coverage report (requires nyc)
+npm run test:coverage
+```
+
+### Test Structure
+
+- **Unit Tests** (`test/unit/`) - Test individual modules in isolation
+- **Integration Tests** (`test/integration/`) - Test complete API workflows
+- **Test Utilities** (`test/utils/`) - Shared helpers and mock factories
+
+See `test/README.md` for detailed testing guide and best practices.
 
 ---
 
